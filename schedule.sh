@@ -56,8 +56,6 @@ k delete -f ./yaml/daemon-set/nginx-ingress.yaml $f
 
 
 
-s
-
 
 
 

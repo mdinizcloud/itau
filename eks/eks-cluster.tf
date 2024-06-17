@@ -8,7 +8,7 @@ module "eks" {
 
   vpc_id                         = module.vpc.vpc_id
   subnet_ids                     = module.vpc.public_subnets
-  #control_plane_subnet_ids       = module.vpc.private_subnets
+  control_plane_subnet_ids       = module.vpc.private_subnets
   cluster_endpoint_public_access = true
   cluster_service_ipv4_cidr      = "172.20.0.0/16" 
 
@@ -20,9 +20,9 @@ module "eks" {
     one = {
       name           = "node-group-1"
       instance_types = ["t3.small"]
-      min_size       = 1
-      max_size       = 5
-      desired_size   = 3
+      min_size       = 3
+      max_size       = 7
+      desired_size   = 5
     }
 
     two = {
