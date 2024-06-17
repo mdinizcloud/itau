@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: back-chuck-dir
+  annotations:    
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+    #nginx.org/rewrites: "serviceName=app1-svc rewrite=/;serviceName=app2-svc rewrite=/"
+    nginx.org/rewrites: "serviceName=back2future-quote-service rewrite=/;serviceName=chuck-quote-service rewrite=/"
+
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - proxy.cybertron.corp
+    secretName: cybertron.corp
+      
+  rules:
+  - host: proxy.cybertron.corp
+    http:
+     paths:
+      
+      - path: /back
+        pathType: Prefix
+        backend:
+          service:
+            name: back2future-quote-service
+            port:
+              number: 80      
+      
+      
+      - path: /chuck
+        pathType: Prefix
+        backend:
+          service:
+            name: chuck-quote-service
+            port: 
+              number: 8080

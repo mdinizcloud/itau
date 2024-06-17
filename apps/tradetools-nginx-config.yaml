@@ -1,0 +1,69 @@
+apiVersion: v1
+data:
+
+  default.conf: |
+     
+      server {
+            listen 80 default_server;
+
+            location /nginx-health {
+            access_log off;
+            default_type text/plain;
+            return 200 "healthy\n";
+            }
+         }
+  tradetools.conf: |
+    
+    server {
+          resolver kube-dns.kube-system.svc.cluster.local;
+          listen 80;
+          server_name trade.fidelize.com.br;
+          root /var/www/html/;
+          access_log /var/log/nginxfront/pbm.com-access.log;
+          error_log  /var/log/nginxfront/pbm.com-error.log debug;
+
+          charset utf-8;
+          
+          location = /favicon.ico { log_not_found off; access_log off; }
+          location = /robots.txt  { access_log off; log_not_found off; }
+
+          error_page 404 /index.php;
+
+          location ~ ^\/(.*?)\/(.*)\.(php|phtml)?$ {
+              fastcgi_pass $1-trade.tradetools-webol.svc.cluster.local:9000;
+              fastcgi_index index.php;
+              fastcgi_read_timeout 600;
+              fastcgi_param SCRIPT_FILENAME $document_root/$2.$3;
+              fastcgi_buffer_size 128k;
+              fastcgi_buffers 4 256k;
+              fastcgi_busy_buffers_size 256k;
+              fastcgi_intercept_errors on;
+              include fastcgi_params;
+              client_max_body_size 100M;
+              #NGINX TIMEOUT SET
+              proxy_read_timeout 600;
+              proxy_connect_timeout 600;
+              proxy_send_timeout 600;
+              proxy_http_version 1.1;
+          }
+
+          location ~ ^\/(.*?)$ {
+           try_files $uri /$1/index.php;
+        }
+         # location /healthz {
+          # proxy_pass https://localhost;
+          #  access_log off;
+          #  return 200 'PASS';
+           # add_header Content-Type text/plain;
+          #}
+
+          # Deny .htaccess file access
+          location ~ /\.ht {
+          deny all;
+          }
+      }
+      
+kind: ConfigMap
+metadata:
+  name: nginx-https-trade
+  namespace: nginx-front
