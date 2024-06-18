@@ -18,18 +18,18 @@ module "eks" {
 
   eks_managed_node_groups = {
     one = {
-      name           = "node-group-1"
+      name           = "node-control"
       instance_types = ["t3.small"]
       min_size       = 3
       max_size       = 7
-      desired_size   = 5
+      desired_size   = 3
     }
 
     two = {
-      name           = "node-group-2"
+      name           = "node-worker"
       instance_types = ["t3.small"]
       min_size       = 1
-      max_size       = 5
+      max_size       = 7
       desired_size   = 3
     }
   }

@@ -1,4 +1,3 @@
-#_code_dynatrace_
 USING(
   IN "SNMPv2-MIB::snmpTrapOID":STRING,
   INOUT "F5-BIGIP-COMMON-MIB::bigipNotifyObjMsg":STRING,
