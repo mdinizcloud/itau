@@ -15,7 +15,8 @@ curl -v telnet://$EXTERNAL_IP:443
 
 
 
-
+curl -v http://apps.itau.com.br/v1/back
+k -n nginx-ingress port-forward svc/ingress-nginx-controller 80
 
 
 
