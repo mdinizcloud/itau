@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: back-chuck-dir
+  name: main
   annotations:    
     #nginx.ingress.kubernetes.io/rewrite-target: /
     #nginx.org/rewrites: "serviceName=app1-svc rewrite=/;serviceName=app2-svc rewrite=/"
@@ -19,6 +19,14 @@ spec:
     http:
      paths:
       
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-ingress
+            port: 
+              number: 80
+
       - path: /back
         pathType: Prefix
         backend:
