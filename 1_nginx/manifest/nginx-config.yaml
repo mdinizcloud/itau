@@ -7,3 +7,4 @@ data:
   proxy-protocol: "True"
   real-ip-header: "proxy_protocol"
   set-real-ip-from: "0.0.0.0/0"
+  use-proxy-protocol: "true"
