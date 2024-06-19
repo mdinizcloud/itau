@@ -6,7 +6,10 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
 --namespace nginx-ingress \
 --set controller.metrics.enabled=true \
 --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" \
---set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
+--set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true" \
+--set controller.ingressClassResource.default=true 
+
+
 
 EXTERNAL_IP=35.172.151.118
 
