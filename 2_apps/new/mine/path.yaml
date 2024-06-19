@@ -12,7 +12,7 @@ spec:
     http:
       paths:
       - path: /service-a(/|$)(.*)
-        pathType: ExternalName
+        pathType: Prefix
         backend:
           service:
             name: service-a
@@ -20,7 +20,7 @@ spec:
               number: 80
       
       - path: /service-b(/|$)(.*)
-        pathType: ExternalName
+        pathType: Prefix
         backend:
           service:
             name: service-b
