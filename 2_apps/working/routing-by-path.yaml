@@ -19,13 +19,13 @@ spec:
             port:
               number: 80
       
-      # - path: /service-b(/|$)(.*)
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: service-b
-      #       port:
-      #         number: 80
+      - path: /service-b(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: service-b
+            port:
+              number: 80
 
 
 # ---
