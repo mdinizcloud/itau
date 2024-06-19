@@ -14,7 +14,7 @@ k apply -f rbac.yaml
 k apply -f crds/
 k apply -f nginx-ingress.yaml
 k apply -f ingress-class.yaml
-k apply -f loadbalancer-aws-elb
+k apply -f loadbalancer-aws-elb.yaml
 ## ********************************************************************************************* ##
 
 
