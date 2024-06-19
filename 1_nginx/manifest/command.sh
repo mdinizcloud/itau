@@ -5,6 +5,7 @@ k apply -f default-server-secret.yaml
 k apply -f nginx-config.yaml
 k apply -f ingress-class.yaml
 
+k apply -f crds.yaml
 
 k apply -f crds/
 k apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.5.2/deploy/crds.yaml
