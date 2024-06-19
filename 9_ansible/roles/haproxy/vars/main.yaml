@@ -1,0 +1,22 @@
+---
+openssl_url: "https://www.openssl.org/source/openssl-3.2.0-alpha2.tar.gz"
+openssl_dir: /tmp/openssl-3.2.0-alpha2
+
+haproxy_build: 2.7
+haproxy_patch: 10
+username_haproxy: haproxy
+groupname: haproxy
+home_haproxy: /home/haproxy 
+password_haproxy: $6$7zPdEjUF$fMiwyRHDJx.9OZAIqjfbgpjvHKT3M9EEtDrFk6gWiJexL0QXLAJNcx40Y777LZpJvF.S4cTkhU1WW.Nt5z3gK0
+expires: 1759761701   #REPLACE-WITH-EPOCH
+haproxy_ip: "{{ hostvars['proxy']['ansible_default_ipv4']['address'] }}"
+haproxy_hostname: "{{ hostvars['proxy']['ansible_hostname'] }}"
+haproxy_dir: "/tmp/haproxy-{{ haproxy_build }}.{{ haproxy_patch }}"
+
+k_version: 2.2.8
+vip_ip: "192.168.100.147"
+
+username_ansible: ansible
+home_ansible: /home/ansible 
+password_ansible: $6$7zPdEjUF$fMiwyRHDJx.9OZAIqjfbgpjvHKT3M9EEtDrFk6gWiJexL0QXLAJNcx40Y777LZpJvF.S4cTkhU1WW.Nt5z3gK0
+expires_ansible: 1759761701   #REPLACE-WITH-EPOCH

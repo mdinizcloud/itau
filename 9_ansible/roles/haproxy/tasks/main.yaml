@@ -1,0 +1,25 @@
+- name: Configure Ansible User Access
+  import_tasks: ansible_user.yaml
+
+- name: Install Dependencies Packages
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - python-sphinx
+    - epel-release
+    - python-sphinx_rtd_theme
+    - openssl-devel
+    - "@Development tools"
+    - net-tools
+    - telnet
+    - perl-IPC-Cmd
+
+- name: Install OpenSSL 3.2.0
+  import_tasks: openssl.yaml
+
+- name: Install KeepAlived 2.2.8
+  import_tasks: keepalived.yaml
+
+- name: Install HAProxy 2.7.10
+  import_tasks: haproxy.yaml

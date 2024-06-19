@@ -1,0 +1,17 @@
+---
+- hosts: proxy
+  become: yes
+  roles:
+    - haproxy
+  vars:
+    haproxy_build: 2.7
+    haproxy_patch: 10
+
+    k_version: 2.2.8
+    vip_ip: "192.168.100.147"
+
+    openssl_url: "https://www.openssl.org/source/openssl-3.2.0-alpha2.tar.gz"
+    openssl_dir: /tmp/openssl-3.2.0-alpha2
+
+
+    

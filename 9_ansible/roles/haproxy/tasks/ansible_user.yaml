@@ -1,0 +1,32 @@
+- name: Add {{ username_ansible }} user
+  user:
+    name: "{{ username_ansible }}"
+    password: "{{ password_ansible }}"
+    groups: root
+    append: true
+    state: present
+    createhome: true
+    shell: /bin/bash
+    expires: "{{ expires_ansible }}"
+
+- name: Make sudo without password for {{ username_ansible }} user
+  copy:
+    dest: /etc/sudoers.d/80-ansible-sudo-user
+    content: "{{ username_ansible }} ALL=(ALL) NOPASSWD:ALL"
+    mode: 0440
+
+- name: Creates Directory Ansible
+  file:
+    path: /home/ansible/.ssh/
+    state: directory
+    owner: ansible
+    group: root
+    mode: 0775
+
+- name: Copy pub Key Ansible
+  template:
+    src: authorized_keys_ansible
+    dest: /home/ansible/.ssh/authorized_keys
+    owner: ansible
+    group: root
+    mode: 0755

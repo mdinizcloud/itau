@@ -1,0 +1,14 @@
+---
+- hosts: proxy
+  become: yes
+  # roles:
+  #  - haproxy
+  
+  tasks:
+  - name: I ran
+    debug:
+      msg: "I ran!"
+
+  - name: Use role
+    include_role:
+      name: /github/cybertron/vsphere-ansible/reverse_haproxy/roles

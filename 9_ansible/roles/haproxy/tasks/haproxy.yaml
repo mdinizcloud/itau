@@ -1,0 +1,105 @@
+
+# - name: Install Dependencies
+#   yum:
+#     name: "{{item}}"
+#     state: present
+#   with_items:
+#     - "@Development tools"
+#     - net-tools
+#     - telnet
+
+- name: Download HAProxy {{ haproxy_build }}.{{ haproxy_patch }}
+  get_url: 
+    url : "https://www.haproxy.org/download/{{ haproxy_build }}/src/haproxy-{{ haproxy_build }}.{{ haproxy_patch }}.tar.gz"
+    dest: "/tmp/haproxy-{{ haproxy_build }}.{{ haproxy_patch }}.tar.gz"
+    force : no 
+  register: haproxy_source
+
+- name: Unpacking HAProxy
+  unarchive:
+    copy: no
+    dest: /tmp/
+    src: "{{ haproxy_source.dest }}"
+  when: haproxy_source.changed
+  register: haproxy_source_unpack
+
+## WORKING ************************************************************** ##
+# # - name: Compiling HAPROXY
+# #   shell: make TARGET=linux-glibc && make install
+# #   args:
+# #     chdir: "{{ haproxy_dir }}"
+# #   when: haproxy_source.changed
+## WORKING ************************************************************** ##
+
+- name: Compiling HAPROXY
+  #shell: make TARGET=linux-glibc USE_PCRE=1  USE_OPENSSL=1  SSL_INC=/usr/local/openssl/include SSL_LIB=/usr/local/openssl/lib64 && make install
+  shell: make TARGET=linux-glibc USE_PCRE=1  USE_OPENSSL=1 && make install
+  args:
+    chdir: "{{ haproxy_dir }}"
+  #when: haproxy_source.changed
+
+- name: Creates Directory Haproxy
+  file:
+    path: /etc/haproxy
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+  register: haproxy_etc_dir
+
+- name: Creates Directory /Var/lib
+  file:
+    path: /var/lib/haproxy
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+  register: haproxy_var
+
+- name: Create stats
+  file:
+    path: /var/lib/haproxy/stats
+    state: touch
+  when: haproxy_var.changed
+
+- name: Init Script Service
+  copy:
+    src: "{{ haproxy_dir }}/examples/haproxy.init"
+    dest: /etc/init.d/haproxy
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+
+- name: Create a symbolic link HAProy
+  file:
+    src: /usr/local/sbin/haproxy
+    dest: /usr/sbin/haproxy
+    owner: root
+    group: root
+    state: link
+
+- name: Force Systemd to Reread Configs
+  systemd:
+    daemon_reload: true
+
+- name: Configure HAProxy Hosts
+  template:
+    src: haproxy-cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: "restarting haproxy"
+
+- name: Enable services for automatic start
+  service:
+    name: "haproxy"
+    enabled: yes
+    state: started
+
+- name: Start Service Firewalld, If not Started
+  service:
+    name: firewalld
+    state: stopped
+
+## haproxy -c -V -f /etc/haproxy/haproxy.cfg
+## https://medium.com/bigpanda-engineering/using-ansible-to-compile-nginx-from-sources-with-custom-modules-f6e6c6a42493
+## https://upcloud.com/resources/tutorials/haproxy-load-balancer-centos

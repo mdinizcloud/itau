@@ -1,0 +1,4 @@
+---
+# defaults file for haproxy
+
+# Last place where ansible will look for variables

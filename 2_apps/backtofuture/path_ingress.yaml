@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: back-chuck-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: chuck.cybertron.corp
+    http:
+     paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chuck-quote-service
+            port:
+              number: 8080
+                  
+  - host: back.cybertron.corp
+    http:
+     paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: back2future-quote-service
+            port:
+              number: 80    

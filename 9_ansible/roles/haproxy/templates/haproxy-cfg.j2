@@ -1,0 +1,144 @@
+global
+   log /dev/log local0
+   log /dev/log local1 notice
+   chroot /var/lib/haproxy
+   stats timeout 30s
+   user root
+   group root
+   daemon
+
+defaults
+   log global
+   mode tcp
+   #option httplog
+   option dontlognull
+   timeout connect 5000
+   timeout client 50000
+   timeout server 50000
+
+listen stats
+  bind    *:8080
+  mode    http
+  stats   enable
+  stats   hide-version
+  
+  stats   uri       /stats
+  stats   refresh   30s
+  stats   realm     Haproxy\ Statistics
+  #stats   auth      Admin:Nts1001!@#
+  stats   show-legends
+  stats   admin if TRUE
+
+#----------------------------------------------------------------------
+#______________________ K8S Control Pannel 6443 _________________________
+#----------------------------------------------------------------------
+frontend k8s-managers-6443
+    bind *:6443
+    #mode http
+    # acl acl_k8s_ubuntu_cp hdr(host) -i proxy.cybertron.corp
+    # acl acl_k8s_trial_cp hdr(host) -i trial.cybertron.corp
+    # use_backend k8s_managers_cp if acl_k8s_ubuntu_cp
+    # use_backend k8s_trial_cp if acl_k8s_trial_cp
+    
+    default_backend k8s_managers_cp
+
+backend k8s_managers_cp
+    balance roundrobin
+    #mode tcp
+    option tcp-check
+    balance roundrobin
+    option forwardfor
+
+    default-server check maxconn 20
+    server cerebros 192.168.100.156:6443 check port 6443
+    server cosmos 192.168.100.157:6443 check port 6443
+    server blast 192.168.100.158:6443 check port 6443
+
+#----------------------------------------------------------------------
+#______________________ K8S ETCDCTL 2379 2380 _________________________
+#----------------------------------------------------------------------
+frontend k8s-managers-2379
+    bind *:2379
+    bind *:2380 
+    #mode http
+    # acl acl_k8s_ubuntu_etcd hdr(host) -i proxy.cybertron.corp
+    # acl acl_k8s_trial_etcd hdr(host) -i trial.cybertron.corp
+    # use_backend k8s_managers_etcd if acl_k8s_ubuntu_etcd
+    # use_backend k8s_trial_etcd if acl_k8s_trial_etcd
+    
+    default_backend k8s_managers_etcd
+
+backend k8s_managers_etcd
+    balance roundrobin
+    mode tcp
+    default-server check maxconn 20
+    server cerebros 192.168.100.156 check port 2379
+    server cosmos 192.168.100.157 check port 2379
+    server blast 192.168.100.158 check port 2379
+
+
+#----------------------------------------------------------------------
+#______________________ K8S Ingress HTTPS 443 _________________________
+#----------------------------------------------------------------------
+frontend k8s-api-https-proxy
+    bind *:443 name rancher-prod
+    mode http
+    
+    #tcp-request inspect-delay 5s
+    # acl acl_k8s_ubuntu_https hdr(host) -i proxy.cybertron.corp
+    # acl acl_k8s_trial_https hdr(host) -i trial.cybertron.corp
+    # use_backend k8s_https if acl_k8s_ubuntu_https
+    # use_backend k8s_https_trial if acl_k8s_trial_https
+
+    default_backend k8s_https
+
+backend k8s_https
+    mode http
+    option forwardfor
+    balance static-rr
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s
+    server brawl 192.168.100.159:443 check port 443
+    server brawn 192.168.100.160:443 check port 443
+    server blurr 192.168.100.161:443 check port 443
+
+
+#----------------------------------------------------------------------
+#_________________________ Ingress HTTP 80 ____________________________
+#----------------------------------------------------------------------
+frontend http-proxy
+    bind *:80 name rancher-prod
+    #mode tcp
+    #mode http
+    # acl acl_k8s_ubuntu_http hdr(host) -i proxy.cybertron.corp
+    # acl acl_k8s_trial_http hdr(host) -i trial.cybertron.corp
+    # use_backend k8s_http if acl_k8s_ubuntu_http
+    # use_backend k8s_http_trial if acl_k8s_trial_http
+
+    default_backend k8s_http
+
+backend k8s_http
+    #mode tcp
+    #option httpchk
+    option forwardfor
+    balance static-rr
+
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s
+    server brawl 192.168.100.159:80 check port 80
+    server brawn 192.168.100.160:80 check port 80
+    server blurr 192.168.100.161:80 check port 80  
+
+#----------------------------------------------------------------------
+#_________________________ NodePort Rancher ___________________________
+#----------------------------------------------------------------------
+frontend ft_api-nodeport
+    bind *:30000-32767 name rancher-prod
+    default_backend bk-nodeport
+
+backend bk-nodeport
+    mode tcp
+    balance static-rr
+    # option forwardfor
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s 
+    server brawl 192.168.100.159 check port 6443
+    server brawn 192.168.100.160 check port 6443
+    server blurr 192.168.100.161 check port 6443  

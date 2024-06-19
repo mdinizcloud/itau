@@ -1,0 +1,64 @@
+---
+- hosts: "proxy"
+  gather_facts: no
+  user: devops
+  become: yes
+  tasks: 
+## alias *********************************************************** ##
+    - name: Check if alias scripts is already installed
+      stat:
+        path: /etc/profile.d/alias.sh
+      register: alias
+      
+    - debug:
+        msg: "Alias was created successfully..."
+      when: alias.stat.exists
+    
+    - debug:
+        msg: "Alias not found"
+      when: alias.stat.exists == False
+
+    - name: Creating alias.sh Init Scripts
+      copy:
+        dest: "/etc/profile.d/alias.sh"
+        content: |
+          alias t='terraform'
+          alias k='kubectl'
+          alias g='git'
+          alias p='python3'
+          alias d='docker'
+          alias dc='docker-compose'
+          alias a='ansible'
+          alias ap='ansible-playbook'
+          alias ag='ansible-galaxy'
+          alias av='ansible-vault'
+          alias ai='ansible-inventory'
+      when: alias.stat.exists == False
+
+    - name: Install NTP
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ntp
+        #- ntpstat
+
+    - name: Configure HAProxy Hosts
+      template:
+        src: ./ntp.conf
+        dest: /etc/ntp.conf
+      notify: Restart NTP
+        
+    - name: Enable services for automatic start
+      service:
+        name: "ntpd"
+        enabled: yes
+        state: started
+    
+    - name: Set timezone to Sao Paulo
+      timezone:
+        name: America/Sao_Paulo
+
+  handlers:
+  - name: Restart NTP
+    service: name=ntp state=restarted        

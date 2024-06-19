@@ -1,0 +1,14 @@
+galaxy_info:
+  author: Marcelo Diniz
+  description: Galaxy
+  company: Cybertron.Corp
+
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 1.2
+
+  galaxy_tags: []
+
+#allow_duplicates: true    #Protect you from yourself, prevent the role to apply more than once
+
+dependencies:
+  #- role: haproxy

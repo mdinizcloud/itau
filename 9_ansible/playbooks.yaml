@@ -1,0 +1,70 @@
+---
+- hosts: "proxy"
+  gather_facts: no
+  user: root
+  vars:
+    - temp_dir: "/tmp/id_rsa.pub"
+    - devops_password: '2w3e4r!Q@W#E'
+  
+  tasks:
+    - name: Copy SSH public Key
+      copy:
+        dest: "{{ temp_dir }}"
+        content: |
+          ssh-rsa 
+        #state: present
+      #when: openssl.stat.exists == False
+
+    - name: Get ssh keys
+      slurp:
+        src: /tmp/id_rsa.pub
+      register: ssh_keys
+      tags:
+        - ssh
+
+    - name: Check keys
+      debug: msg="{{ ssh_keys['content'] | b64decode }}"
+      tags:
+        - ssh
+
+    - name: Deploy Keys Root on Nodes 
+      authorized_key: 
+        user: root 
+        key: "{{ item[1]  }}"
+      delegate_to: "{{ item[0] }}"
+      with_nested:
+        - "{{ groups['proxy'] }}"
+        #- "{{ groups['proxy'] }}"        
+        - "{{ ssh_keys['content'] | b64decode }}"
+      tags:
+        - ssh
+
+    - name: Add a new user named devops
+      user:
+        name: devops
+        shell: /bin/bash
+        password: "{{ devops_password }}"
+    
+    - name: Add devops user to the sudoers
+      copy:
+        dest: "/etc/sudoers.d/devops"
+        content: "devops  ALL=(ALL)  NOPASSWD: ALL"
+
+    - name: Deploy Keys on Nodes 
+      authorized_key: 
+        user: devops 
+        key: "{{ item[1]  }}"
+      delegate_to: "{{ item[0] }}"
+      with_nested:
+        - "{{ groups['proxy'] }}"
+        #- "{{ groups['proxy'] }}"
+        - "{{ ssh_keys['content'] | b64decode }}"
+      tags:
+        - devops_ssh
+
+    - name: Delete temp id_rsa.pub
+      file:
+        state: absent
+        path: "{{ item }}"
+      loop:  
+        - "{{ temp_dir }}"

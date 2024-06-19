@@ -1,0 +1,57 @@
+# - name: Install KeepAlived Dependencies
+#   yum:
+#     name: "{{item}}"
+#     state: present
+#   with_items:
+#     - python-sphinx
+#     - epel-release
+#     - python-sphinx_rtd_theme
+#     - openssl-devel
+
+- name: Download Keepalived {{ k_version }}
+  get_url: 
+    url : "https://www.keepalived.org/software/keepalived-{{ k_version }}.tar.gz"
+    dest: "/tmp/keepalived-{{ k_version }}.tar.gz"
+    force : no
+  register: keep_source 
+
+- name: Unpacking Keepalived
+  unarchive:
+    copy: no
+    dest: /tmp/
+    src: "{{ keep_source.dest }}"
+  when: keep_source.changed
+  register: keep_unpack
+
+- name: Compiling KeepAlive
+  shell: ./configure
+  args:
+    chdir: "/tmp/keepalived-{{ k_version }}"
+  register: compile_keep
+  #when: keep_source.changed
+
+- name: Install KeepAlive
+  shell: make && make install
+  args:
+    chdir: "/tmp/keepalived-{{ k_version }}"
+  when: compile_keep.changed
+
+- name: Create Keepalived Directory
+  file:
+    path: /etc/keepalived
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
+- name: Copy KeepAlived Init Scripts
+  template:
+    src: keepalived-conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  #notify: restarting keepalived
+
+- name: Enable services for automatic start
+  service:
+    name: "keepalived"
+    enabled: yes
+    state: started

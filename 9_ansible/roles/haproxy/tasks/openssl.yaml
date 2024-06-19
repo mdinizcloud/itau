@@ -1,0 +1,42 @@
+- name: Remove Openssl 1.0
+  action: yum name=openssl state=absent
+
+# - name: Install Perl
+#   action: yum name=perl-IPC-Cmd state=latest
+
+- name: Download OpenSSL 3.2.0
+  get_url: 
+    url : "{{ openssl_url }}"
+    dest: "/tmp/openssl-3.2.0-alpha2.tar.gz"
+    force : no
+  register: openssl_source 
+
+- name: Unpacking OpenSSL
+  unarchive:
+    copy: no
+    dest: /tmp/
+    src: "{{ openssl_source.dest }}"
+  when: openssl_source.changed
+  register: open_source_unpack
+
+- name: Compiling OpenSSL
+  shell: ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
+  args:
+    chdir: "{{ openssl_dir }}"
+  register: compile_openssl
+  when: openssl_source.changed
+
+- name: Install OpenSSL
+  shell: make && make install
+  args:
+    chdir: "{{ openssl_dir }}"
+  when: compile_openssl.changed
+
+- name: ldconfig
+  command: /sbin/ldconfig
+  when: compile_openssl.changed
+
+- name: Copy OpenSSL.SH Init Scripts
+  template:
+    src: openssl.sh
+    dest: /etc/profile.d/openssl.sh

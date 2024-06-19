@@ -41,16 +41,16 @@ aws resourcegroupstaggingapi get-resources --region us-east-1 | grep -i resource
 
 
 
+t apply
+
+aws eks --region $(t output -raw region) update-kubeconfig --name $(t output -raw cluster_name) --no-verify-ssl
 
 
-k delete ns nginx-ingress $f
-k delete -f ./yaml/common/ingress-class.yaml $f
-k delete -f ./yaml/common/ns-and-sa.yaml $f
-k delete -f ./yaml/shared-examples/default-server-secret.yaml $f
-k delete -f ./yaml/common/nginx-config.yaml $f
-k delete -f ./yaml/rbac/rbac.yaml $f
-k delete -f ./yaml/crds/ $f
-k delete -f ./yaml/daemon-set/nginx-ingress.yaml $f
+
+
+
+
+
 
 
 
