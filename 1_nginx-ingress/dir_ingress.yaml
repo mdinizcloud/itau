@@ -9,12 +9,17 @@ metadata:
 
 spec:
   ingressClassName: nginx
+  # tls:
+  # - hosts:
+  #   - proxy.cybertron.corp
+  #   secretName: cybertron.corp
+      
   rules:
-  - host: proxy.cybertron.com
+  - host: apps.itau.com.br
     http:
      paths:
       
-      - path: /back
+      - path: /v1/back
         pathType: Prefix
         backend:
           service:
@@ -23,7 +28,7 @@ spec:
               number: 80      
       
       
-      - path: /chuck
+      - path: /v1/chuck
         pathType: Prefix
         backend:
           service:
