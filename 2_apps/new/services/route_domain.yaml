@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: service-a
 spec:
-  ingressClassName: default
+  #ingressClassName: default
   rules:
   - host: services-a.itau.com.br
     http:
@@ -21,7 +21,7 @@ kind: Ingress
 metadata:
   name: service-b
 spec:
-  ingressClassName: default
+  #ingressClassName: default
   rules:
   - host: services-b.itau.com.br
     http:
