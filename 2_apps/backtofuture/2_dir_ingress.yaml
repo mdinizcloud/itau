@@ -9,13 +9,13 @@ metadata:
 
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - proxy.cybertron.corp
-    secretName: cybertron.corp
+  # tls:
+  # - hosts:
+  #   - proxy.cybertron.corp
+  #   secretName: cybertron.corp
       
   rules:
-  - host: proxy.cybertron.corp
+  - host: www.itau.com.br
     http:
      paths:
       
