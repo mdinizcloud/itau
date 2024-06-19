@@ -19,13 +19,13 @@ spec:
     http:
      paths:
       
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-ingress
-            port: 
-              number: 80
+      # - path: /
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: nginx-ingress
+      #       port: 
+      #         number: 80
 
       - path: /back
         pathType: Prefix
