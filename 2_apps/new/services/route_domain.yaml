@@ -33,4 +33,3 @@ spec:
             name: service-b
             port:
               number: 80
----
