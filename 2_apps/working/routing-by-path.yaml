@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: service-path
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: apps.itau.com.br
+    http:
+      paths:
+      - path: /service-a(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: service-a
+            port:
+              number: 80
+      
+      # - path: /service-b(/|$)(.*)
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: service-b
+      #       port:
+      #         number: 80
+
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: service-path-b
+#   annotations:
+#     nginx.ingress.kubernetes.io/use-regex: "true"  
+#     nginx.ingress.kubernetes.io/rewrite-target: /$2
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: services.cybertron.com
+#     http:
+#       paths:
+#       - path: /service-b(/|$)(.*)
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: service-b
+#             port:
+#               number: 80
+# ---

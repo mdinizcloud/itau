@@ -1,6 +1,6 @@
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
-k create namespace nginx-ingress
+k create ns nginx-ingress
 
 helm install ingress-nginx ingress-nginx/ingress-nginx \
 --namespace nginx-ingress \
@@ -12,6 +12,16 @@ EXTERNAL_IP=35.172.151.118
 
 curl -v telnet://$EXTERNAL_IP:80
 curl -v telnet://$EXTERNAL_IP:443
+
+
+####################### ABOVE WORK #################
+
+
+
+
+
+
+
 
 
 
